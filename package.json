@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.2"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11",
+    "@types/bun": "latest"
+  },
+  "name": "node_pr_roleauth",
+  "module": "index.js",
+  "type": "module",
+  "private": true,
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
