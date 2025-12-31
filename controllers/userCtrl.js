@@ -68,7 +68,7 @@ const userCtl = {
             const token = jwt.sign(payload, "myTokenKey");
             console.log(token);
             res.cookie('token',token);
-            return res.json({ message: "Login Successful !" });
+            return res.json({ message: "Login Successful !" , token : token});
         } catch (error) {
             return res.json(error);
         }
