@@ -74,12 +74,12 @@ const dashboardCtl = {
             let data = await Response.json();
             let employee = data.data.filter((item) => item.role === 'Employee')
 
-            return res.render('./pages/viewEmployee.ejs', {
+            return res.render('./pages/ViewEmployee.ejs', {
                 employee
             })
         } catch (error) {
             console.log(error.message);
-            return res.render('./pages/viewEmployee.ejs', {
+            return res.render('./pages/ViewEmployee.ejs', {
                 employee: []
             });
         }
