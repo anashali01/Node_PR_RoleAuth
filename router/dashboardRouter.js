@@ -7,7 +7,7 @@ const dashboardRouter = Router();
 dashboardRouter.get('/login' , dashboardCtl.loginPage);
 dashboardRouter.post('/login' , dashboardCtl.login);
 dashboardRouter.get('/logout',dashboardCtl.logout)
-dashboardRouter.use(dashboardAuth)
+dashboardRouter.use(dashboardAuth);
 
 dashboardRouter.get('/',dashboardCtl.dashboardPage);
 dashboardRouter.get('/addData',dashboardCtl.addDataPage);

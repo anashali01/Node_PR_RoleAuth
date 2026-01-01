@@ -5,15 +5,18 @@ const dashboardAuth = async (req, res, next) => {
         const { token } = req.cookies;
         
         if (!token) {
+            console.log('No token found in cookies');
             return res.redirect('/login');
         }
-        let decode = jwt.verify(token , 'myTokenKey');
-        let userData = await User.findOne({_id : decode.userId});
+        
+        console.log('Token from cookie:', token.substring(0, 20) + '...');
+        let decode = jwt.verify(token, 'myTokenKey');
+        let userData = await User.findOne({_id: decode.userId});
         res.locals.user = userData;
         return next();
     } catch (error) {
-        console.log(error.message);
-        return res.json({ message: "Access Denied ! Login First" })
+        console.error('JWT verify error:', error.message);
+        return res.redirect('/login');
     }
 }
 

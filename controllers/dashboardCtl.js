@@ -1,8 +1,7 @@
 import axiosInstance from "../config/axios.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import env from "dotenv";
-env.config();
+import dotenv from "../config/dotenv.js";
 
 const dashboardCtl = {
     dashboardPage(req, res) {
@@ -13,15 +12,21 @@ const dashboardCtl = {
     },
     async login(req, res) {
         try {
-            let response = await fetch(`${process.env.API_URL}api/login`, {
+            let response = await fetch(`${dotenv.API_URL}api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(req.body)
             });
-            let data = await response.json()
-
-            res.cookie('token', data.token)
-
+            let data = await response.json();
+            console.log('API Response:', data);
+            
+            if (!data || !data.token) {
+                console.log('ERROR: No token in response', data);
+                return res.redirect('/login?error=no-token');
+            }
+            
+            console.log('Setting cookie with token');
+            res.cookie('token', data.token);
             return res.redirect('/');
         } catch (error) {
             console.log(error.message);
@@ -36,7 +41,7 @@ const dashboardCtl = {
     },
     async addData(req, res) {
         try {
-            let Response = await fetch(`${process.env.API_URL}api/`, {
+            let Response = await fetch(`${dotenv.API_URL}api/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(req.body)
@@ -50,7 +55,7 @@ const dashboardCtl = {
     },
     async viewManagerPage(req, res) {
         try {
-            let Response = await fetch(`${process.env.API_URL}api/`, {
+            let Response = await fetch(`${dotenv.API_URL}api/`, {
                 method: "GET"
             });
             let data = await Response.json();
@@ -68,7 +73,7 @@ const dashboardCtl = {
     },
     async viewEmployeePage(req, res) {
         try {
-            let Response = await fetch(`${process.env.API_URL}api/`, {
+            let Response = await fetch(`${dotenv.API_URL}api/`, {
                 method: "GET"
             });
             let data = await Response.json();
@@ -86,7 +91,7 @@ const dashboardCtl = {
     },
     async deleteManager(req, res) {
         try {
-            await axiosInstance.delete(`${process.env.API_URL}api/${req.params.id}`);
+            await axiosInstance.delete(`${dotenv.API_URL}api/${req.params.id}`);
             return res.redirect('/ViewManager');
         } catch (error) {
             console.log(error);
@@ -95,7 +100,7 @@ const dashboardCtl = {
     },
     async deleteEmployee(req, res) {
         try {
-            await axiosInstance.delete(`${process.env.API_URL}api/${req.params.id}`);
+            await axiosInstance.delete(`${dotenv.API_URL}api/${req.params.id}`);
             return res.redirect('/ViewEmployee');
         } catch (error) {
             console.log(error);
@@ -104,7 +109,7 @@ const dashboardCtl = {
     },
     async editManagerPage(req, res) {
         try {
-            let data = await axiosInstance.get(`${process.env.API_URL}api/${ req.params.id }`);
+            let data = await axiosInstance.get(`${dotenv.API_URL}api/${ req.params.id }`);
             
             return res.render('./pages/editManager.ejs', {
                 manager: data.data
@@ -116,7 +121,7 @@ const dashboardCtl = {
     },
     async editEmployeePage(req, res) {
         try {
-            let data = await axiosInstance.get(`${process.env.API_URL}api/${ req.params.id }`);
+            let data = await axiosInstance.get(`${dotenv.API_URL}api/${ req.params.id }`);
             
             return res.render('./pages/editEmployee.ejs', {
                 employee: data.data
@@ -131,7 +136,7 @@ const dashboardCtl = {
             console.log(req.body);
             
             req.body.password = await bcrypt.hash(req.body.password, 10);
-            await axiosInstance.patch(`${process.env.API_URL}api/${ req.params.id }`, req.body);
+            await axiosInstance.patch(`${dotenv.API_URL}api/${ req.params.id }`, req.body);
             return res.redirect('/viewManager');
         } catch (error) {
             console.log(error);
@@ -143,7 +148,7 @@ const dashboardCtl = {
             console.log(req.body);
             
             req.body.password = await bcrypt.hash(req.body.password, 10);
-            await axiosInstance.patch(`${process.env.API_URL}api/${ req.params.id }`, req.body);
+            await axiosInstance.patch(`${dotenv.API_URL}api/${ req.params.id }`, req.body);
             return res.redirect('/viewEmployee');
         } catch (error) {
             console.log(error);

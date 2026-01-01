@@ -19,6 +19,9 @@ const userCtl = {
             return res.json({ data: users })
         } catch (error) {
             console.log(error.message);
+        
+            return res.json({ data: [] , message : error})
+
         }
     },
     async getUser(req, res) {
@@ -66,9 +69,9 @@ const userCtl = {
                 Role: user.role
             };
             const token = jwt.sign(payload, "myTokenKey");
-            console.log(token);
-            res.cookie('token',token);
-            return res.json({ message: "Login Successful !" , token : token});
+            console.log('Token created:', token);
+            res.cookie('token', token);
+            return res.json({ message: "Login Successful !", token: token });
         } catch (error) {
             return res.json(error);
         }

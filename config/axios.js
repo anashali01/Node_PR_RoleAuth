@@ -1,9 +1,8 @@
 import axios from 'axios';
-import env from "dotenv";
-env.config();
+import dotenv  from './dotenv.js';
 
 const axiosInstance = axios.create({
-    baseURL: `${process.env.API_URL}`,
+    baseURL: `${dotenv.API_URL}`,
 })
 
 export default axiosInstance;
