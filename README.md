@@ -10,7 +10,7 @@ Use the following credentials to test the application:
 
 ## Live Link
 
-(https://node-pr-role-auth.vercel.app/login) *(Add your deployed URL here)*
+(https://node-pr-role-auth.vercel.app/login) *(deployed URL here)*
 
 # Role-Based Authentication System
 
