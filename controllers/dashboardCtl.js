@@ -2,10 +2,26 @@ import axiosInstance from "../config/axios.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import dotenv from "../config/dotenv.js";
+import jwt from "jsonwebtoken"
+import Task from "../models/task.model.js";
 
 const dashboardCtl = {
-    dashboardPage(req, res) {
-        return res.render('./index.ejs')
+    async dashboardPage(req, res) {
+        try {
+            let managerCount = await User.countDocuments({role : 'Manager'});
+            let employeeCount = await User.countDocuments({role : 'Employee'});
+            let taskCount = await Task.countDocuments({});
+            return res.render('./index.ejs',{
+                managerCount,
+                employeeCount,
+                taskCount
+            })
+        } catch (error) {
+            return res.render('./index.ejs',{
+                managerCount : 0,
+                employeeCount : 0
+            })
+        }
     },
     loginPage(req, res) {
         return res.render('./pages/login.ejs')
@@ -19,12 +35,12 @@ const dashboardCtl = {
             });
             let data = await response.json();
             console.log('API Response:', data);
-            
+
             if (!data || !data.token) {
                 console.log('ERROR: No token in response', data);
                 return res.redirect('/login?error=no-token');
             }
-            
+
             console.log('Setting cookie with token');
             res.cookie('token', data.token);
             return res.redirect('/');
@@ -35,6 +51,38 @@ const dashboardCtl = {
     },
     logout(req, res) {
         return res.clearCookie('token').redirect('/login');
+    },
+    changePasswordPage(req, res) {
+        return res.render('./pages/changePassword.ejs')
+    },
+    async changePassword(req, res) {
+        try {
+            const { currentPassword, newPassword, confirmPassword } = req.body;
+
+            const {token} = req.cookies;
+            let decode = jwt.verify(token, 'myTokenKey');
+            let user = await User.findOne({ _id: decode.userId });
+
+            let isValid = await bcrypt.compare(currentPassword, user.password);
+
+            if (isValid) {
+                if (newPassword == confirmPassword) {
+                    user.password = await bcrypt.hash(newPassword, 10);
+                    await user.save();
+                    return res.redirect('/login');
+                } else {
+                    req.flash('error', "Password Doesn't Match !");
+                    return res.redirect(req.get('Referrer') || '/');
+                }
+            } else {
+                req.flash('error', 'Password Is Invalid');
+                return req.redirect(req.get('Referrer') || '/');
+            }
+        } catch (error) {
+            console.log(error);
+
+            console.log(`Error occurred !`);
+        }
     },
     addDataPage(req, res) {
         return res.render('./pages/AddData.ejs')
@@ -109,8 +157,8 @@ const dashboardCtl = {
     },
     async editManagerPage(req, res) {
         try {
-            let data = await axiosInstance.get(`${dotenv.API_URL}api/${ req.params.id }`);
-            
+            let data = await axiosInstance.get(`${dotenv.API_URL}api/${req.params.id}`);
+
             return res.render('./pages/editManager.ejs', {
                 manager: data.data
             });
@@ -121,8 +169,8 @@ const dashboardCtl = {
     },
     async editEmployeePage(req, res) {
         try {
-            let data = await axiosInstance.get(`${dotenv.API_URL}api/${ req.params.id }`);
-            
+            let data = await axiosInstance.get(`${dotenv.API_URL}api/${req.params.id}`);
+
             return res.render('./pages/editEmployee.ejs', {
                 employee: data.data
             });
@@ -134,9 +182,9 @@ const dashboardCtl = {
     async editManager(req, res) {
         try {
             console.log(req.body);
-            
+
             req.body.password = await bcrypt.hash(req.body.password, 10);
-            await axiosInstance.patch(`${dotenv.API_URL}api/${ req.params.id }`, req.body);
+            await axiosInstance.patch(`${dotenv.API_URL}api/${req.params.id}`, req.body);
             return res.redirect('/viewManager');
         } catch (error) {
             console.log(error);
@@ -146,9 +194,9 @@ const dashboardCtl = {
     async editEmployee(req, res) {
         try {
             console.log(req.body);
-            
+
             req.body.password = await bcrypt.hash(req.body.password, 10);
-            await axiosInstance.patch(`${dotenv.API_URL}api/${ req.params.id }`, req.body);
+            await axiosInstance.patch(`${dotenv.API_URL}api/${req.params.id}`, req.body);
             return res.redirect('/viewEmployee');
         } catch (error) {
             console.log(error);
@@ -161,7 +209,7 @@ const dashboardCtl = {
             const { id } = req.params;
             let data = await User.findById(id);
             console.log(data);
-            
+
             data.role = "Admin";
             await data.save();
             return res.redirect('/viewManager');
