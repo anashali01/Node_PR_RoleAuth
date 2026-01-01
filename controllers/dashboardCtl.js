@@ -13,7 +13,7 @@ const dashboardCtl = {
     },
     async login(req, res) {
         try {
-            let response = await fetch(`${process.env.API_URL}login`, {
+            let response = await fetch(`${process.env.API_URL}api/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(req.body)
